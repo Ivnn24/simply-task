@@ -1821,7 +1821,7 @@ export const AnalyticsDashboard = () => {
 };
 
 // ============ ENHANCED SUBJECT-BASED VIEW ============
-export const SubjectView = ({ tasks, viewMode }: { tasks: Task[]; viewMode: 'list' | 'grid' }) => {
+export const SubjectView = ({ tasks, viewMode, onTaskClick }: { tasks: Task[]; viewMode: 'list' | 'grid'; onTaskClick?: (task: Task) => void }) => {
   const subjectMap = new Map<string, Task[]>();
 
   tasks.forEach((task) => {
@@ -1879,7 +1879,9 @@ export const SubjectView = ({ tasks, viewMode }: { tasks: Task[]; viewMode: 'lis
               <div className="p-4 space-y-3 bg-white/50">
                 <AnimatePresence>
                   {subjectTasks.map((task) => (
-                    <TaskCard key={task.id} task={task} />
+                    <motion.div key={task.id} layout onClick={() => onTaskClick?.(task)} className={onTaskClick ? "cursor-pointer hover:scale-[1.02] transition-transform" : ""}>
+                      <TaskCard task={task} />
+                    </motion.div>
                   ))}
                 </AnimatePresence>
               </div>

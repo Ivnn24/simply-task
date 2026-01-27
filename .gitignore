@@ -36,3 +36,6 @@ dist-ssr
 # Build
 build/
 *.tsbuildinfo
+
+.vercel
+.env*.local

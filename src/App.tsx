@@ -5,10 +5,12 @@ import {
   TaskForm, TaskCard, ScoreCard, StreakCard, FocusModeButton, 
   AnalyticsDashboard, SubjectView, WeeklyReport 
 } from './components';
-import { AIInsights } from './AIInsights';
-import { RichTextEditor, RenderFormattedText } from './RichTextEditor';
-import { exportTasksToCSV, exportTasksToPDF } from './export-service';
 import { motion, AnimatePresence } from 'framer-motion';
+import RichTextEditor, { parseRichText } from './RichTextEditor';
+import { 
+  requestNotificationPermission, 
+  checkAndNotifyUpcomingTasks
+} from './notifications';
 import { 
   Sun, Moon, List, Grid3x3, BookOpen, Sparkles, 
   CheckCircle2, Circle, Layout, Plus, Clock, Bell, X, Save, AlertTriangle, Calendar,
@@ -47,6 +49,7 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
   const [editedNotes, setEditedNotes] = useState(task.notes || '');
   const [editedSubject, setEditedSubject] = useState(task.subject);
   const [editedDueDate, setEditedDueDate] = useState(task.dueDate);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -57,6 +60,7 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
   }, []);
 
   const handleSave = () => {
+    setIsSaving(true);
     updateTask(task.id, {
       title: editedTitle,
       notes: editedNotes,
@@ -64,6 +68,7 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
       dueDate: editedDueDate
     });
     setIsEditing(false);
+    setIsSaving(false);
   };
 
   const removeFile = (fileId: string) => {
@@ -89,25 +94,25 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div 
         initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }}
-        className={`w-full max-w-lg rounded-2xl shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[85vh] my-4 sm:my-0 ${isDarkMode ? 'bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 text-white border border-indigo-800/30' : 'bg-white text-slate-900'}`}
+        className={`w-full max-w-lg rounded-2xl shadow-2xl flex flex-col max-h-[85vh] ${isDarkMode ? 'bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 text-white border border-indigo-800/30' : 'bg-white text-slate-900'}`}
         onClick={(e) => e.stopPropagation()} 
       >
         {/* Modal Header (Fixed) */}
-        <div className={`flex-shrink-0 px-4 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between ${isDarkMode ? 'border-indigo-700/30 bg-indigo-900/20' : 'border-slate-100'}`}>
-          <div className="flex items-center gap-2 min-w-0">
-            <div className={`w-3 h-3 rounded-full flex-shrink-0 ${task.priority === 'Urgent' ? 'bg-red-500' : task.priority === 'High' ? 'bg-orange-500' : 'bg-blue-500'}`} />
-            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider opacity-70 truncate">{task.priority} Priority</span>
+        <div className={`flex-shrink-0 px-6 py-4 border-b flex items-center justify-between ${isDarkMode ? 'border-indigo-700/30 bg-indigo-900/20' : 'border-slate-100'}`}>
+          <div className="flex items-center gap-2">
+            <div className={`w-3 h-3 rounded-full ${task.priority === 'Urgent' ? 'bg-red-500' : task.priority === 'High' ? 'bg-orange-500' : 'bg-blue-500'}`} />
+            <span className="text-sm font-bold uppercase tracking-wider opacity-70">{task.priority} Priority</span>
           </div>
-          <button onClick={onClose} className="p-1.5 sm:p-2 rounded-full hover:bg-slate-500/20 transition-colors flex-shrink-0"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-500/20 transition-colors"><X className="w-5 h-5" /></button>
         </div>
 
         {/* Modal Content (Scrollable) */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
           
           {/* Title Section */}
           <div>
@@ -116,14 +121,14 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
               <input 
                 value={editedTitle} 
                 onChange={(e) => setEditedTitle(e.target.value)}
-                className={`w-full p-2 sm:p-3 rounded-lg font-bold text-lg outline-none border-2 focus:border-blue-500 bg-transparent ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
+                className={`w-full p-2 rounded-lg font-bold text-lg outline-none border-2 focus:border-blue-500 bg-transparent ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
               />
             ) : (
-              <h2 className="text-xl sm:text-2xl font-bold leading-tight">{task.title}</h2>
+              <h2 className="text-2xl font-bold leading-tight">{task.title}</h2>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 gap-4">
              {/* Subject */}
              <div>
                 <label className="text-xs font-bold uppercase opacity-50 mb-1 block">Subject</label>
@@ -131,12 +136,12 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
                    <input 
                       value={editedSubject}
                       onChange={(e) => setEditedSubject(e.target.value)}
-                      className={`w-full p-2 sm:p-3 rounded-lg text-sm bg-transparent border ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
+                      className={`w-full p-2 rounded-lg text-sm bg-transparent border ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
                    />
                 ) : (
                    <div className="flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                      <span className="font-medium truncate">{task.subject}</span>
+                      <BookOpen className="w-4 h-4 text-blue-500" />
+                      <span className="font-medium">{task.subject}</span>
                    </div>
                 )}
              </div>
@@ -149,36 +154,33 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
                       type="datetime-local"
                       value={editedDueDate.substring(0, 16)}
                       onChange={(e) => setEditedDueDate(new Date(e.target.value).toISOString())}
-                      className={`w-full p-2 sm:p-3 rounded-lg text-sm bg-transparent border ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
+                      className={`w-full p-2 rounded-lg text-sm bg-transparent border ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
                    />
                 ) : (
                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-red-500 flex-shrink-0" />
-                      <span className="font-medium truncate">{formatDatePH(task.dueDate)}</span>
+                      <Calendar className="w-4 h-4 text-red-500" />
+                      <span className="font-medium">{formatDatePH(task.dueDate)}</span>
                    </div>
                 )}
              </div>
           </div>
 
-          {/* Notes Section - With Rich Text Editor */}
-          <div>
+          {/* Notes Section - Fixed Scrolling Issue here */}
+          <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-indigo-900/20 border border-indigo-700/30' : 'bg-slate-50'}`}>
             <label className="text-xs font-bold uppercase opacity-50 mb-2 block flex items-center gap-2">
-               Notes / Description
+               Notes / Description (with Rich Text Support)
             </label>
             {isEditing ? (
-              <RichTextEditor 
+              <RichTextEditor
                 value={editedNotes}
-                onChange={(value) => setEditedNotes(value)}
+                onChange={setEditedNotes}
                 isDarkMode={isDarkMode}
-                rows={6}
+                placeholder="Add your notes here... (Use **text** for bold, *text* for italic)"
+                rows={8}
               />
             ) : (
-              <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-indigo-900/20 border border-indigo-700/30' : 'bg-slate-50 border border-slate-200'}`}>
-                {task.notes ? (
-                  <RenderFormattedText text={task.notes} isDarkMode={isDarkMode} />
-                ) : (
-                  <span className={`italic opacity-50 ${isDarkMode ? 'text-indigo-200' : 'text-slate-600'}`}>No notes added.</span>
-                )}
+              <div className={`whitespace-pre-wrap leading-relaxed text-sm overflow-hidden ${isDarkMode ? 'text-indigo-100' : 'text-slate-600'}`}>
+                {task.notes ? parseRichText(task.notes) : <span className="italic opacity-50">No notes added.</span>}
               </div>
             )}
           </div>
@@ -228,35 +230,36 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
         </div>
 
         {/* Modal Footer Actions (Fixed) */}
-        <div className={`flex-shrink-0 px-4 sm:px-6 py-3 sm:py-4 border-t flex flex-col sm:flex-row gap-3 justify-end ${isDarkMode ? 'border-indigo-700/30 bg-indigo-900/15' : 'border-slate-100 bg-slate-50'}`}>
+        <div className={`flex-shrink-0 px-6 py-4 border-t flex justify-end gap-3 ${isDarkMode ? 'border-indigo-700/30 bg-indigo-900/15' : 'border-slate-100 bg-slate-50'}`}>
           {isEditing ? (
             <>
               <button 
                 onClick={() => setIsEditing(false)}
-                className="px-4 py-2 rounded-lg text-sm font-bold opacity-70 hover:opacity-100 order-2 sm:order-1"
+                className="px-4 py-2 rounded-lg text-sm font-bold opacity-70 hover:opacity-100"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleSave}
-                className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold flex items-center justify-center gap-2 order-1 sm:order-2"
+                disabled={isSaving}
+                className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-bold flex items-center gap-2"
               >
-                <Save className="w-4 h-4" /> Save
+                <Save className="w-4 h-4" /> {isSaving ? 'Saving...' : 'Save Changes'}
               </button>
             </>
           ) : (
             <>
               <button 
                  onClick={() => onDeleteClick(task.id)}
-                 className="px-4 py-2 rounded-xl text-red-500 text-sm font-bold hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors order-2 sm:order-1 sm:mr-auto"
+                 className="mr-auto px-4 py-2 rounded-xl text-red-500 text-sm font-bold hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
               >
                  Delete
               </button>
               <button 
                 onClick={() => setIsEditing(true)}
-                className={`px-6 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors order-1 sm:order-2 ${isDarkMode ? 'bg-slate-700 hover:bg-slate-600 text-white' : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-900'}`}
+                className={`px-6 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors ${isDarkMode ? 'bg-slate-700 hover:bg-slate-600 text-white' : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-900'}`}
               >
-                Edit
+                Edit Details
               </button>
             </>
           )}
@@ -269,18 +272,25 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
 
 // ============ MAIN APP COMPONENT ============
 export default function App() {
-  const { tasks, notifications, addNotification, markRead, clearNotifications, isDarkMode, toggleTheme, deleteTask } = useStore();
+  const { tasks, notifications, addNotification, markRead, clearNotifications, isDarkMode, toggleTheme, deleteTask, initializeDevice } = useStore();
   const [viewMode, setViewMode] = useState<'list' | 'grid' | 'subject'>('list');
   const [showForm, setShowForm] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [, setIsMobileMenuOpen] = useState(false); // For mobile hamburger menu
+  const [showSearchBar, setShowSearchBar] = useState(false);
   
   // State for Features
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; taskId: string | null }>({ show: false, taskId: null });
+
+  // Initialize device on mount
+  useEffect(() => {
+    initializeDevice();
+  }, [initializeDevice]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -297,18 +307,35 @@ export default function App() {
         e.preventDefault();
         setShowForm(!showForm);
       }
+      // Ctrl+Shift+F or Cmd+Shift+F for search
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'f') {
+        e.preventDefault();
+        setShowSearchBar(!showSearchBar);
+      }
+      // Ctrl+/ or Cmd+/ for help
+      if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+        e.preventDefault();
+        setShowHelpModal(!showHelpModal);
+      }
       // Escape to close search and modals
       if (e.key === 'Escape') {
         setSearchQuery('');
         setShowForm(false);
+        setShowSearchBar(false);
+        setIsMobileMenuOpen(false);
       }
     };
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showForm]);
+  }, [showForm, showSearchBar, showHelpModal]);
 
-  // Timer: Clock + Notification Checker
+  // Initialize push notifications on app mount
+  useEffect(() => {
+    requestNotificationPermission();
+  }, []);
+
+  // Timer: Clock + Notification Checker + Push Notifications
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
@@ -328,6 +355,11 @@ export default function App() {
                addNotification(`Task Overdue: "${task.title}" is past due!`, 'warning');
             }
          });
+      }
+
+      // Check for push notifications every 5 minutes
+      if (now.getMinutes() % 5 === 0 && now.getSeconds() === 0) {
+        checkAndNotifyUpcomingTasks(tasks);
       }
     }, 1000);
     return () => clearInterval(timer);
@@ -459,21 +491,32 @@ export default function App() {
                   {/* NOTIFICATION DROPDOWN */}
                   <AnimatePresence>
                      {showNotifications && (
-                        <motion.div
-                           initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                           animate={{ opacity: 1, y: 0, scale: 1 }}
-                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                           className={`absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-2xl shadow-2xl border overflow-hidden z-[100] ${
-                              isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'
-                           }`}
-                        >
+                        <>
+                           {/* Mobile Backdrop */}
+                           <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              onClick={() => setShowNotifications(false)}
+                              className="fixed inset-0 md:hidden z-[100] bg-black/30"
+                           />
+                           
+                           {/* Notification Modal */}
+                           <motion.div
+                              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                              className={`fixed md:absolute top-20 md:top-full left-1/2 md:left-auto md:right-0 md:mt-2 -translate-x-1/2 md:translate-x-0 w-[calc(100%-2rem)] md:w-96 rounded-2xl shadow-2xl border overflow-hidden z-[101] max-h-[calc(100vh-8rem)] md:max-h-80 ${
+                                 isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'
+                              }`}
+                           >
                            <div className="p-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                               <h3 className={`font-bold text-sm ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Notifications</h3>
                               {notifications.length > 0 && (
                                  <button onClick={clearNotifications} className="text-xs text-blue-500 hover:underline">Clear all</button>
                               )}
                            </div>
-                           <div className="max-h-80 overflow-y-auto">
+                           <div className="overflow-y-auto max-h-[60vh] md:max-h-[calc(70vh-60px)]">
                               {notifications.length === 0 ? (
                                  <div className="p-8 text-center text-gray-500 text-sm">No new notifications</div>
                               ) : (
@@ -503,36 +546,11 @@ export default function App() {
                                  ))
                               )}
                            </div>
-                        </motion.div>
+                           </motion.div>
+                        </>
                      )}
                   </AnimatePresence>
                </div>
-
-              {/* Export Buttons */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => exportTasksToCSV(tasks, `tasks-${new Date().toISOString().split('T')[0]}.csv`)}
-                  className={`p-2.5 rounded-xl transition-all border text-xs font-medium ${
-                    isDarkMode 
-                      ? 'bg-slate-800 text-green-400 border-slate-700 hover:bg-slate-700' 
-                      : 'bg-white text-green-600 border-slate-200 hover:bg-slate-50 shadow-sm'
-                  }`}
-                  title="Export to CSV"
-                >
-                  CSV
-                </button>
-                <button
-                  onClick={() => exportTasksToPDF(tasks, `tasks-${new Date().toISOString().split('T')[0]}.html`)}
-                  className={`p-2.5 rounded-xl transition-all border text-xs font-medium ${
-                    isDarkMode 
-                      ? 'bg-slate-800 text-purple-400 border-slate-700 hover:bg-slate-700' 
-                      : 'bg-white text-purple-600 border-slate-200 hover:bg-slate-50 shadow-sm'
-                  }`}
-                  title="Export to PDF/HTML"
-                >
-                  PDF
-                </button>
-              </div>
 
               <button
                 onClick={toggleTheme}
@@ -576,7 +594,6 @@ export default function App() {
                 </div>
                 <WeeklyReport />
                 <AnalyticsDashboard />
-                <AIInsights isDarkMode={isDarkMode} />
              </div>
           </aside>
 
@@ -635,7 +652,7 @@ export default function App() {
                              ))}
                           </div>
                        ) : viewMode === 'subject' ? (
-                          <SubjectView tasks={todoTasks} viewMode="grid" /> 
+                          <SubjectView tasks={todoTasks} viewMode="grid" onTaskClick={handleTaskClick} /> 
                        ) : (
                           <div className="space-y-3">
                              {todoTasks.map(task => (
