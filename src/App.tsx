@@ -6,6 +6,7 @@ import {
   AnalyticsDashboard, SubjectView, WeeklyReport 
 } from './components';
 import { AIInsights } from './AIInsights';
+import { RichTextEditor, RenderFormattedText } from './RichTextEditor';
 import { exportTasksToCSV, exportTasksToPDF } from './export-service';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -88,25 +89,25 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
       onClick={onClose}
     >
       <motion.div 
         initial={{ scale: 0.95, y: 10 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 10 }}
-        className={`w-full max-w-lg rounded-2xl shadow-2xl flex flex-col max-h-[85vh] ${isDarkMode ? 'bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 text-white border border-indigo-800/30' : 'bg-white text-slate-900'}`}
+        className={`w-full max-w-lg rounded-2xl shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[85vh] my-4 sm:my-0 ${isDarkMode ? 'bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-950 text-white border border-indigo-800/30' : 'bg-white text-slate-900'}`}
         onClick={(e) => e.stopPropagation()} 
       >
         {/* Modal Header (Fixed) */}
-        <div className={`flex-shrink-0 px-6 py-4 border-b flex items-center justify-between ${isDarkMode ? 'border-indigo-700/30 bg-indigo-900/20' : 'border-slate-100'}`}>
-          <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${task.priority === 'Urgent' ? 'bg-red-500' : task.priority === 'High' ? 'bg-orange-500' : 'bg-blue-500'}`} />
-            <span className="text-sm font-bold uppercase tracking-wider opacity-70">{task.priority} Priority</span>
+        <div className={`flex-shrink-0 px-4 sm:px-6 py-3 sm:py-4 border-b flex items-center justify-between ${isDarkMode ? 'border-indigo-700/30 bg-indigo-900/20' : 'border-slate-100'}`}>
+          <div className="flex items-center gap-2 min-w-0">
+            <div className={`w-3 h-3 rounded-full flex-shrink-0 ${task.priority === 'Urgent' ? 'bg-red-500' : task.priority === 'High' ? 'bg-orange-500' : 'bg-blue-500'}`} />
+            <span className="text-xs sm:text-sm font-bold uppercase tracking-wider opacity-70 truncate">{task.priority} Priority</span>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-slate-500/20 transition-colors"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-1.5 sm:p-2 rounded-full hover:bg-slate-500/20 transition-colors flex-shrink-0"><X className="w-5 h-5" /></button>
         </div>
 
         {/* Modal Content (Scrollable) */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 custom-scrollbar">
           
           {/* Title Section */}
           <div>
@@ -115,14 +116,14 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
               <input 
                 value={editedTitle} 
                 onChange={(e) => setEditedTitle(e.target.value)}
-                className={`w-full p-2 rounded-lg font-bold text-lg outline-none border-2 focus:border-blue-500 bg-transparent ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
+                className={`w-full p-2 sm:p-3 rounded-lg font-bold text-lg outline-none border-2 focus:border-blue-500 bg-transparent ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
               />
             ) : (
-              <h2 className="text-2xl font-bold leading-tight">{task.title}</h2>
+              <h2 className="text-xl sm:text-2xl font-bold leading-tight">{task.title}</h2>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
              {/* Subject */}
              <div>
                 <label className="text-xs font-bold uppercase opacity-50 mb-1 block">Subject</label>
@@ -130,12 +131,12 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
                    <input 
                       value={editedSubject}
                       onChange={(e) => setEditedSubject(e.target.value)}
-                      className={`w-full p-2 rounded-lg text-sm bg-transparent border ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
+                      className={`w-full p-2 sm:p-3 rounded-lg text-sm bg-transparent border ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
                    />
                 ) : (
                    <div className="flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-blue-500" />
-                      <span className="font-medium">{task.subject}</span>
+                      <BookOpen className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                      <span className="font-medium truncate">{task.subject}</span>
                    </div>
                 )}
              </div>
@@ -148,33 +149,36 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
                       type="datetime-local"
                       value={editedDueDate.substring(0, 16)}
                       onChange={(e) => setEditedDueDate(new Date(e.target.value).toISOString())}
-                      className={`w-full p-2 rounded-lg text-sm bg-transparent border ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
+                      className={`w-full p-2 sm:p-3 rounded-lg text-sm bg-transparent border ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`}
                    />
                 ) : (
                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-red-500" />
-                      <span className="font-medium">{formatDatePH(task.dueDate)}</span>
+                      <Calendar className="w-4 h-4 text-red-500 flex-shrink-0" />
+                      <span className="font-medium truncate">{formatDatePH(task.dueDate)}</span>
                    </div>
                 )}
              </div>
           </div>
 
-          {/* Notes Section - Fixed Scrolling Issue here */}
-          <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-indigo-900/20 border border-indigo-700/30' : 'bg-slate-50'}`}>
+          {/* Notes Section - With Rich Text Editor */}
+          <div>
             <label className="text-xs font-bold uppercase opacity-50 mb-2 block flex items-center gap-2">
                Notes / Description
             </label>
             {isEditing ? (
-              <textarea 
+              <RichTextEditor 
                 value={editedNotes}
-                onChange={(e) => setEditedNotes(e.target.value)}
-                rows={8}
-                className={`w-full bg-transparent p-2 rounded-lg border focus:ring-2 ring-blue-500 outline-none ${isDarkMode ? 'border-indigo-600 text-indigo-100' : 'border-slate-200 text-slate-700'}`}
-                placeholder="Add your notes here..."
+                onChange={(value) => setEditedNotes(value)}
+                isDarkMode={isDarkMode}
+                rows={6}
               />
             ) : (
-              <div className={`whitespace-pre-wrap leading-relaxed text-sm overflow-hidden ${isDarkMode ? 'text-indigo-100' : 'text-slate-600'}`}>
-                {task.notes ? task.notes : <span className="italic opacity-50">No notes added.</span>}
+              <div className={`p-4 rounded-xl ${isDarkMode ? 'bg-indigo-900/20 border border-indigo-700/30' : 'bg-slate-50 border border-slate-200'}`}>
+                {task.notes ? (
+                  <RenderFormattedText text={task.notes} isDarkMode={isDarkMode} />
+                ) : (
+                  <span className={`italic opacity-50 ${isDarkMode ? 'text-indigo-200' : 'text-slate-600'}`}>No notes added.</span>
+                )}
               </div>
             )}
           </div>
@@ -224,35 +228,35 @@ const TaskDetailModal = ({ task, onClose, isDarkMode, onDeleteClick }: { task: T
         </div>
 
         {/* Modal Footer Actions (Fixed) */}
-        <div className={`flex-shrink-0 px-6 py-4 border-t flex justify-end gap-3 ${isDarkMode ? 'border-indigo-700/30 bg-indigo-900/15' : 'border-slate-100 bg-slate-50'}`}>
+        <div className={`flex-shrink-0 px-4 sm:px-6 py-3 sm:py-4 border-t flex flex-col sm:flex-row gap-3 justify-end ${isDarkMode ? 'border-indigo-700/30 bg-indigo-900/15' : 'border-slate-100 bg-slate-50'}`}>
           {isEditing ? (
             <>
               <button 
                 onClick={() => setIsEditing(false)}
-                className="px-4 py-2 rounded-lg text-sm font-bold opacity-70 hover:opacity-100"
+                className="px-4 py-2 rounded-lg text-sm font-bold opacity-70 hover:opacity-100 order-2 sm:order-1"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleSave}
-                className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold flex items-center gap-2"
+                className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold flex items-center justify-center gap-2 order-1 sm:order-2"
               >
-                <Save className="w-4 h-4" /> Save Changes
+                <Save className="w-4 h-4" /> Save
               </button>
             </>
           ) : (
             <>
               <button 
                  onClick={() => onDeleteClick(task.id)}
-                 className="mr-auto px-4 py-2 rounded-xl text-red-500 text-sm font-bold hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                 className="px-4 py-2 rounded-xl text-red-500 text-sm font-bold hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors order-2 sm:order-1 sm:mr-auto"
               >
                  Delete
               </button>
               <button 
                 onClick={() => setIsEditing(true)}
-                className={`px-6 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors ${isDarkMode ? 'bg-slate-700 hover:bg-slate-600 text-white' : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-900'}`}
+                className={`px-6 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors order-1 sm:order-2 ${isDarkMode ? 'bg-slate-700 hover:bg-slate-600 text-white' : 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-900'}`}
               >
-                Edit Details
+                Edit
               </button>
             </>
           )}

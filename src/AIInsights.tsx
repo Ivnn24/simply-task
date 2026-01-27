@@ -22,6 +22,9 @@ import {
   ChevronUp,
   Lightbulb,
   TrendingUp,
+  AlertCircle,
+  Sparkles,
+  Award,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -43,7 +46,7 @@ export function AIInsights({ isDarkMode }: AIInsightsProps) {
   };
 
   return (
-    <div className={`space-y-4 p-6 rounded-2xl border ${isDarkMode ? 'bg-gradient-to-br from-indigo-950/50 via-slate-900/50 to-indigo-900/30 border-indigo-700/30' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200'}`}>
+    <div className={`space-y-3 sm:space-y-4 p-4 sm:p-6 rounded-2xl border ${isDarkMode ? 'bg-gradient-to-br from-indigo-950/50 via-slate-900/50 to-indigo-900/30 border-indigo-700/30' : 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200'}`}>
       {/* SMART RECOMMENDATIONS */}
       {recommendations.length > 0 && (
         <motion.div
@@ -54,18 +57,18 @@ export function AIInsights({ isDarkMode }: AIInsightsProps) {
         >
           <button
             onClick={() => toggleSection('recommendations')}
-            className={`w-full p-4 flex items-center justify-between ${isDarkMode ? 'hover:bg-indigo-900/30' : 'hover:bg-blue-50'} transition-colors`}
+            className={`w-full p-3 sm:p-4 flex items-center justify-between ${isDarkMode ? 'hover:bg-indigo-900/30' : 'hover:bg-blue-50'} transition-colors`}
           >
-            <div className="flex items-center gap-3">
-              <Target className="w-5 h-5 text-blue-500" />
-              <span className="font-bold flex items-center gap-2">
-                🎯 Smart Recommendations
-                <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-700'}`}>
+            <div className="flex items-center gap-3 min-w-0">
+              <Target className="w-5 h-5 text-blue-500 flex-shrink-0" />
+              <span className="font-bold flex items-center gap-2 text-sm sm:text-base">
+                Smart Recommendations
+                <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-700'}`}>
                   {recommendations.length}
                 </span>
               </span>
             </div>
-            {expandedSection === 'recommendations' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            {expandedSection === 'recommendations' ? <ChevronUp className="w-5 h-5 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 flex-shrink-0" />}
           </button>
 
           <AnimatePresence>
@@ -77,22 +80,22 @@ export function AIInsights({ isDarkMode }: AIInsightsProps) {
                 className={`border-t ${isDarkMode ? 'border-indigo-700/40' : 'border-blue-200'} divide-y ${isDarkMode ? 'divide-indigo-700/40' : 'divide-blue-200'}`}
               >
                 {recommendations.map((rec, idx) => (
-                  <div key={idx} className={`p-4 ${isDarkMode ? 'hover:bg-indigo-900/30' : 'hover:bg-blue-50'} transition-colors`}>
+                  <div key={idx} className={`p-3 sm:p-4 ${isDarkMode ? 'hover:bg-indigo-900/30' : 'hover:bg-blue-50'} transition-colors`}>
                     <div className="flex items-start gap-3">
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold ${
                         rec.category === 'deadline' ? 'bg-red-500/20 text-red-400' :
                         rec.category === 'focus' ? 'bg-purple-500/20 text-purple-400' :
                         rec.category === 'streak' ? 'bg-orange-500/20 text-orange-400' :
                         'bg-blue-500/20 text-blue-400'
                       }`}>
-                        {rec.confidence > 90 ? '🔥' : rec.confidence > 75 ? '⭐' : '💡'}
+                        {rec.confidence > 90 ? <Flame className="w-4 h-4" /> : rec.confidence > 75 ? <TrendingUp className="w-4 h-4" /> : <Lightbulb className="w-4 h-4" />}
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">{rec.title}</h4>
-                        <p className={`text-sm mt-1 ${isDarkMode ? 'text-indigo-200/70' : 'text-blue-700/70'}`}>{rec.reason}</p>
-                        <div className="mt-2 flex items-center justify-between">
-                          <span className="text-xs font-medium opacity-60">Confidence: {rec.confidence}%</span>
-                          <div className="w-24 h-1.5 bg-slate-400/30 rounded-full overflow-hidden">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm sm:text-base">{rec.title}</h4>
+                        <p className={`text-xs sm:text-sm mt-1 ${isDarkMode ? 'text-indigo-200/70' : 'text-blue-700/70'}`}>{rec.reason}</p>
+                        <div className="mt-2 flex items-center justify-between gap-2">
+                          <span className="text-xs font-medium opacity-60 flex-shrink-0">Confidence: {rec.confidence}%</span>
+                          <div className="w-16 sm:w-24 h-1.5 bg-slate-400/30 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all"
                               style={{ width: `${rec.confidence}%` }}
@@ -119,18 +122,18 @@ export function AIInsights({ isDarkMode }: AIInsightsProps) {
         >
           <button
             onClick={() => toggleSection('insights')}
-            className={`w-full p-4 flex items-center justify-between ${isDarkMode ? 'hover:bg-amber-900/30' : 'hover:bg-amber-100/50'} transition-colors`}
+            className={`w-full p-3 sm:p-4 flex items-center justify-between ${isDarkMode ? 'hover:bg-amber-900/30' : 'hover:bg-amber-100/50'} transition-colors`}
           >
-            <div className="flex items-center gap-3">
-              <Lightbulb className="w-5 h-5 text-amber-500" />
-              <span className="font-bold flex items-center gap-2">
-                💡 Productivity Insights
-                <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? 'bg-amber-900/50 text-amber-300' : 'bg-amber-200 text-amber-800'}`}>
+            <div className="flex items-center gap-3 min-w-0">
+              <Lightbulb className="w-5 h-5 text-amber-500 flex-shrink-0" />
+              <span className="font-bold flex items-center gap-2 text-sm sm:text-base">
+                Productivity Insights
+                <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${isDarkMode ? 'bg-amber-900/50 text-amber-300' : 'bg-amber-200 text-amber-800'}`}>
                   {insights.length}
                 </span>
               </span>
             </div>
-            {expandedSection === 'insights' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            {expandedSection === 'insights' ? <ChevronUp className="w-5 h-5 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 flex-shrink-0" />}
           </button>
 
           <AnimatePresence>
@@ -141,25 +144,32 @@ export function AIInsights({ isDarkMode }: AIInsightsProps) {
                 exit={{ opacity: 0, height: 0 }}
                 className={`border-t ${isDarkMode ? 'border-amber-700/40' : 'border-amber-200'} divide-y ${isDarkMode ? 'divide-amber-700/40' : 'divide-amber-200'}`}
               >
-                {insights.map((insight, idx) => (
-                  <div key={idx} className={`p-4 ${isDarkMode ? 'hover:bg-amber-900/30' : 'hover:bg-amber-100/30'} transition-colors`}>
+                {insights.map((insight, idx) => {
+                  const getInsightIcon = () => {
+                    switch(insight.type) {
+                      case 'warning': return <AlertCircle className="w-5 h-5 text-red-500" />;
+                      case 'opportunity': return <Sparkles className="w-5 h-5 text-purple-500" />;
+                      case 'achievement': return <Award className="w-5 h-5 text-yellow-500" />;
+                      case 'pattern': return <BarChart3 className="w-5 h-5 text-blue-500" />;
+                    }
+                  };
+                  return (
+                  <div key={idx} className={`p-3 sm:p-4 ${isDarkMode ? 'hover:bg-amber-900/30' : 'hover:bg-amber-100/30'} transition-colors`}>
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 text-2xl">
-                        {insight.type === 'warning' && '⚠️'}
-                        {insight.type === 'opportunity' && '💎'}
-                        {insight.type === 'achievement' && '🏆'}
-                        {insight.type === 'pattern' && '📊'}
+                      <div className="flex-shrink-0 mt-0.5">
+                        {getInsightIcon()}
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">{insight.title}</h4>
-                        <p className={`text-sm mt-1 ${isDarkMode ? 'text-amber-100/70' : 'text-amber-900/70'}`}>{insight.message}</p>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm sm:text-base">{insight.title}</h4>
+                        <p className={`text-xs sm:text-sm mt-1 ${isDarkMode ? 'text-amber-100/70' : 'text-amber-900/70'}`}>{insight.message}</p>
                         <p className={`text-xs mt-2 font-medium ${insight.priority === 'high' ? 'text-red-500' : insight.priority === 'medium' ? 'text-amber-500' : 'text-green-500'}`}>
-                          💡 {insight.actionable}
+                          {insight.actionable}
                         </p>
                       </div>
                     </div>
                   </div>
-                ))}
+                );
+                })}
               </motion.div>
             )}
           </AnimatePresence>
@@ -175,13 +185,13 @@ export function AIInsights({ isDarkMode }: AIInsightsProps) {
       >
         <button
           onClick={() => toggleSection('metrics')}
-          className={`w-full p-4 flex items-center justify-between ${isDarkMode ? 'hover:bg-green-900/30' : 'hover:bg-green-100/50'} transition-colors`}
+          className={`w-full p-3 sm:p-4 flex items-center justify-between ${isDarkMode ? 'hover:bg-green-900/30' : 'hover:bg-green-100/50'} transition-colors`}
         >
-          <div className="flex items-center gap-3">
-            <BarChart3 className="w-5 h-5 text-green-500" />
-            <span className="font-bold">📈 Performance Metrics</span>
+          <div className="flex items-center gap-3 min-w-0">
+            <BarChart3 className="w-5 h-5 text-green-500 flex-shrink-0" />
+            <span className="font-bold text-sm sm:text-base">Performance Metrics</span>
           </div>
-          {expandedSection === 'metrics' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          {expandedSection === 'metrics' ? <ChevronUp className="w-5 h-5 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 flex-shrink-0" />}
         </button>
 
         <AnimatePresence>
@@ -190,9 +200,9 @@ export function AIInsights({ isDarkMode }: AIInsightsProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className={`border-t ${isDarkMode ? 'border-green-700/40 p-4' : 'border-green-200 p-4'}`}
+              className={`border-t ${isDarkMode ? 'border-green-700/40 p-3 sm:p-4' : 'border-green-200 p-3 sm:p-4'}`}
             >
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <MetricCard
                   icon={<CheckCircle className="w-5 h-5" />}
                   label="Completion Rate"
@@ -222,10 +232,10 @@ export function AIInsights({ isDarkMode }: AIInsightsProps) {
                   isDarkMode={isDarkMode}
                 />
               </div>
-              <div className={`mt-4 p-3 rounded-lg text-sm ${isDarkMode ? 'bg-slate-900/50 text-slate-300' : 'bg-slate-100 text-slate-600'}`}>
-                <p>Most Productive Day: <strong>{metrics.mostProductiveDay}</strong></p>
-                <p>Average Tasks/Day: <strong>{metrics.averageTasksPerDay}</strong></p>
-                <p>Focus Priority: <strong>{metrics.averagePriority}</strong></p>
+              <div className={`mt-3 sm:mt-4 p-2 sm:p-3 rounded-lg text-xs sm:text-sm ${isDarkMode ? 'bg-slate-900/50 text-slate-300' : 'bg-slate-100 text-slate-600'}`}>
+                <p className="truncate">Most Productive Day: <strong>{metrics.mostProductiveDay}</strong></p>
+                <p className="truncate">Average Tasks/Day: <strong>{metrics.averageTasksPerDay}</strong></p>
+                <p className="truncate">Focus Priority: <strong>{metrics.averagePriority}</strong></p>
               </div>
             </motion.div>
           )}
@@ -238,16 +248,16 @@ export function AIInsights({ isDarkMode }: AIInsightsProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className={`rounded-xl overflow-hidden border ${isDarkMode ? 'border-rose-700/40 bg-rose-900/20' : 'border-rose-200 bg-rose-50/50'} p-4`}
+          className={`rounded-xl overflow-hidden border ${isDarkMode ? 'border-rose-700/40 bg-rose-900/20' : 'border-rose-200 bg-rose-50/50'} p-3 sm:p-4`}
         >
           <div className="flex items-center gap-3 mb-3">
             <Zap className="w-5 h-5 text-rose-500" />
-            <span className="font-bold">⚡ Priority Adjustments</span>
+            <span className="font-bold text-sm sm:text-base">Priority Adjustments</span>
           </div>
           <div className="space-y-2">
             {smartPriorities.slice(0, 3).map((priority, idx) => (
-              <div key={idx} className={`p-3 rounded-lg ${isDarkMode ? 'bg-rose-900/30' : 'bg-rose-100/50'}`}>
-                <p className="text-sm font-medium">{priority.reason}</p>
+              <div key={idx} className={`p-2 sm:p-3 rounded-lg ${isDarkMode ? 'bg-rose-900/30' : 'bg-rose-100/50'}`}>
+                <p className="text-xs sm:text-sm font-medium">{priority.reason}</p>
                 <p className="text-xs mt-1 opacity-70">
                   {priority.currentPriority} → <strong>{priority.suggestedPriority}</strong>
                 </p>
@@ -279,12 +289,12 @@ function MetricCard({ icon, label, value, color, isDarkMode }: MetricCardProps) 
   };
 
   return (
-    <div className={`p-3 rounded-lg border ${colors[color]}`}>
+    <div className={`p-2 sm:p-3 rounded-lg border ${colors[color]}`}>
       <div className="flex items-center gap-2 mb-2">
         {icon}
-        <span className="text-xs font-semibold opacity-70">{label}</span>
+        <span className="text-xs font-semibold opacity-70 flex-1 min-w-0 truncate">{label}</span>
       </div>
-      <p className="text-2xl font-bold">{value}</p>
+      <p className="text-lg sm:text-2xl font-bold">{value}</p>
     </div>
   );
 }
