@@ -14,7 +14,8 @@ import {
 import { 
   Sun, Moon, List, Grid3x3, BookOpen, Sparkles, 
   CheckCircle2, Circle, Layout, Plus, Clock, Bell, X, Save, AlertTriangle, Calendar,
-  FileText, File, Presentation, BarChart3, Paperclip, Trash2, HelpCircle, Copy
+  FileText, File, Presentation, BarChart3, Paperclip, Trash2, HelpCircle, Copy,
+  AlertCircle, CheckCircle, Volume2
 } from 'lucide-react';
 
 // ============ UTILITY FUNCTIONS FOR PH TIME ============
@@ -286,6 +287,7 @@ export default function App() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; taskId: string | null }>({ show: false, taskId: null });
+  const [notificationSoundEnabled, setNotificationSoundEnabled] = useState(true);
 
   // Initialize device on mount
   useEffect(() => {
@@ -350,9 +352,16 @@ export default function App() {
 
             if (diffHours > 0.9 && diffHours < 1.1) {
                addNotification(`Deadline approaching: "${task.title}" is due in 1 hour!`, 'alert');
+               // Play notification sound
+               if (notificationSoundEnabled) {
+                 playNotificationSound();
+               }
             }
             if (diffHours < 0 && diffHours > -0.02) {
                addNotification(`Task Overdue: "${task.title}" is past due!`, 'warning');
+               if (notificationSoundEnabled) {
+                 playNotificationSound();
+               }
             }
          });
       }
@@ -363,7 +372,7 @@ export default function App() {
       }
     }, 1000);
     return () => clearInterval(timer);
-  }, [tasks, addNotification]);
+  }, [tasks, addNotification, notificationSoundEnabled]);
 
   // Filter tasks by search query
   const filteredTasks = tasks.filter(t => {
@@ -388,6 +397,26 @@ export default function App() {
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
+  };
+
+  // Play notification sound
+  const playNotificationSound = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Create a pleasant "notification" sound
+    oscillator.frequency.value = 800; // Start frequency
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.2);
   };
 
   const ViewToggle = ({ mode, icon: Icon, label }: { mode: typeof viewMode, icon: any, label: string }) => (
@@ -513,31 +542,54 @@ export default function App() {
                            >
                            <div className={`p-4 border-b flex justify-between items-center sticky top-0 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-blue-50 border-slate-200'}`}>
                               <h3 className={`font-bold text-lg flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                                🔔 <span>Notifications</span>
+                                <Bell className="w-5 h-5 text-blue-500" /> <span>Notifications</span>
+                                {unreadCount > 0 && (
+                                  <span className="text-xs font-bold bg-red-500 text-white px-2 py-0.5 rounded-full">{unreadCount}</span>
+                                )}
                               </h3>
-                              {notifications.length > 0 && (
-                                 <button onClick={clearNotifications} className="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">✕ Clear</button>
-                              )}
+                              <div className="flex items-center gap-2">
+                                <button 
+                                  onClick={() => setNotificationSoundEnabled(!notificationSoundEnabled)}
+                                  className={`p-1.5 rounded-lg transition-colors ${notificationSoundEnabled ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-gray-400'}`}
+                                  title={notificationSoundEnabled ? 'Sound on' : 'Sound off'}
+                                >
+                                  <Volume2 className="w-4 h-4" />
+                                </button>
+                                {notifications.length > 0 && (
+                                   <button onClick={clearNotifications} className="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/30 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors hover:bg-red-100">
+                                     <X className="w-3 h-3" /> Clear
+                                   </button>
+                                )}
+                              </div>
                            </div>
                            <div className="overflow-y-auto max-h-[calc(75vh-60px)] md:max-h-[calc(90vh-70px)]">
                               {notifications.length === 0 ? (
                                  <div className="p-12 text-center">
-                                    <div className="text-4xl mb-2">✨</div>
+                                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                                      <Sparkles className="w-8 h-8 text-blue-500" />
+                                    </div>
                                     <p className="text-gray-500 text-sm font-medium">No new notifications</p>
                                  </div>
                               ) : (
-                                 notifications.map(notif => (
-                                    <div 
-                                       key={notif.id} 
-                                       onClick={() => handleNotificationClick(notif.id)}
+                                 notifications.map((notif, idx) => (
+                                    <motion.div
+                                      key={notif.id}
+                                      initial={{ opacity: 0, x: -20 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: idx * 0.05 }}
+                                      onClick={() => handleNotificationClick(notif.id)}
                                        className={`p-4 border-b last:border-0 hover:bg-gray-100 dark:hover:bg-slate-700/80 cursor-pointer flex gap-3 transition-colors ${
                                           !notif.isRead ? (isDarkMode ? 'bg-slate-800/80' : 'bg-blue-100/80') : ''
                                        } ${isDarkMode ? 'border-slate-700' : 'border-slate-200'}`}
                                     >
-                                       <div className={`flex-shrink-0 text-2xl pt-1 ${
-                                          notif.type === 'alert' ? '' : notif.type === 'warning' ? '' : ''
-                                       }`}>
-                                          {notif.type === 'alert' ? '🔴' : notif.type === 'warning' ? '🟠' : '🔵'}
+                                       <div className="flex-shrink-0 pt-1">
+                                          {notif.type === 'alert' ? (
+                                            <AlertTriangle className="w-5 h-5 text-red-500" />
+                                          ) : notif.type === 'warning' ? (
+                                            <AlertCircle className="w-5 h-5 text-orange-500" />
+                                          ) : (
+                                            <CheckCircle className="w-5 h-5 text-blue-500" />
+                                          )}
                                        </div>
                                        <div className="flex-1 min-w-0">
                                           <p className={`text-sm font-semibold leading-tight ${isDarkMode ? 'text-slate-100' : 'text-slate-900'}`}>
@@ -546,9 +598,13 @@ export default function App() {
                                           <p className="text-xs text-gray-400 mt-1.5">{formatTimePH(notif.timestamp)}</p>
                                        </div>
                                        {!notif.isRead && (
-                                          <div className="ml-auto flex-shrink-0 pt-2">
-                                             <div className="w-3 h-3 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50 animate-pulse" />
-                                          </div>
+                                          <motion.div 
+                                            className="ml-auto flex-shrink-0 pt-2"
+                                            animate={{ scale: [1, 1.2, 1] }}
+                                            transition={{ repeat: Infinity, duration: 2 }}
+                                          >
+                                             <div className="w-3 h-3 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50" />
+                                          </motion.div>
                                        )}
                                     </div>
                                  ))
