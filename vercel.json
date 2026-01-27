@@ -1,13 +1,6 @@
 {
-  "framework": "vite",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
+  "buildCommand": "cd react && npm ci && npm run build",
+  "outputDirectory": "react/dist",
   "headers": [
     {
       "source": "/assets/(.*)",
