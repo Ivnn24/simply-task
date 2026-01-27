@@ -12,6 +12,24 @@
 - **Sentiment Analysis**: Analyzes tone and emotional context
 - **Metadata Generation**: Auto-generates titles and descriptions
 
+### 🎯 **Smart Recommendations** (NEW)
+- **Task Recommendations**: AI suggests what to focus on next
+- **Intelligent Priority**: Auto-adjusts priorities based on deadlines and complexity
+- **Productivity Insights**: Real-time insights on your work patterns
+- **Performance Metrics**: Track completion rate, streaks, and productivity velocity
+
+### 📊 **Advanced Analytics** (NEW)
+- **Recommendations Dashboard**: 5 types of smart suggestions with confidence scores
+- **Productivity Metrics**: Completion rate, average task time, focus streaks
+- **Subject Balance**: Alerts when studying specific subjects too much
+- **Weekly Stats**: Track tasks completed this week and month
+- **Pattern Recognition**: AI learns your most productive times
+
+### 💾 **Data Export** (NEW)
+- **CSV Export**: Export tasks to Excel/Sheets
+- **PDF Reports**: Generate professional task reports with statistics
+- **One-click Export**: Quick export buttons in header
+
 ### 📄 **File Processing**
 - Supports: PDF, DOCX, PPTX, XLSX, TXT
 - Intelligent text extraction
@@ -142,10 +160,30 @@ src/
 
 ## 📚 Documentation
 
+- [NEW_FEATURES.md](./NEW_FEATURES.md) - Detailed guide to all new AI features
 - [GITHUB_VERCEL_SETUP.md](./GITHUB_VERCEL_SETUP.md) - Deployment guide
 - [.env.example](./.env.example) - Environment template
 - [package.json](./package.json) - Dependencies
 - [vercel.json](./vercel.json) - Vercel config
+
+## 🎯 What's New (v2.0)
+
+**Smart Recommendations System**
+- AI-powered task suggestions based on urgency and importance
+- 5 different recommendation types (deadline, focus, pattern, streak, balance)
+- Confidence scoring for each recommendation
+
+**Advanced Analytics**
+- Real-time productivity metrics and insights
+- Performance tracking (completion rate, streaks, velocity)
+- Subject-based analytics and load balancing
+
+**Data Export**
+- Export tasks to CSV for spreadsheet analysis
+- Generate PDF reports with statistics
+- One-click export from header
+
+See [NEW_FEATURES.md](./NEW_FEATURES.md) for complete details!
 
 ## 🤝 Contributing
 
