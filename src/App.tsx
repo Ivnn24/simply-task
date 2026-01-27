@@ -578,35 +578,35 @@ export default function App() {
                                       animate={{ opacity: 1, x: 0 }}
                                       transition={{ delay: idx * 0.05 }}
                                       onClick={() => handleNotificationClick(notif.id)}
-                                       className={`p-4 border-b last:border-0 hover:bg-gray-100 dark:hover:bg-slate-700/80 cursor-pointer flex gap-3 transition-colors ${
-                                          !notif.isRead ? (isDarkMode ? 'bg-slate-800/80' : 'bg-blue-100/80') : ''
-                                       } ${isDarkMode ? 'border-slate-700' : 'border-slate-200'}`}
+                                      className={`p-4 border-b last:border-0 hover:bg-gray-100 dark:hover:bg-slate-700/80 cursor-pointer flex gap-3 transition-colors ${
+                                        !notif.isRead ? (isDarkMode ? 'bg-slate-800/80' : 'bg-blue-100/80') : ''
+                                      } ${isDarkMode ? 'border-slate-700' : 'border-slate-200'}`}
                                     >
-                                       <div className="flex-shrink-0 pt-1">
-                                          {notif.type === 'alert' ? (
-                                            <AlertTriangle className="w-5 h-5 text-red-500" />
-                                          ) : notif.type === 'warning' ? (
-                                            <AlertCircle className="w-5 h-5 text-orange-500" />
-                                          ) : (
-                                            <CheckCircle className="w-5 h-5 text-blue-500" />
-                                          )}
-                                       </div>
-                                       <div className="flex-1 min-w-0">
-                                          <p className={`text-sm font-semibold leading-tight ${isDarkMode ? 'text-slate-100' : 'text-slate-900'}`}>
-                                             {notif.message}
-                                          </p>
-                                          <p className="text-xs text-gray-400 mt-1.5">{formatTimePH(notif.timestamp)}</p>
-                                       </div>
-                                       {!notif.isRead && (
-                                          <motion.div 
-                                            className="ml-auto flex-shrink-0 pt-2"
-                                            animate={{ scale: [1, 1.2, 1] }}
-                                            transition={{ repeat: Infinity, duration: 2 }}
-                                          >
-                                             <div className="w-3 h-3 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50" />
-                                          </motion.div>
-                                       )}
-                                    </div>
+                                      <div className="flex-shrink-0 pt-1">
+                                        {notif.type === 'alert' ? (
+                                          <AlertTriangle className="w-5 h-5 text-red-500" />
+                                        ) : notif.type === 'warning' ? (
+                                          <AlertCircle className="w-5 h-5 text-orange-500" />
+                                        ) : (
+                                          <CheckCircle className="w-5 h-5 text-blue-500" />
+                                        )}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className={`text-sm font-semibold leading-tight ${isDarkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                                          {notif.message}
+                                        </p>
+                                        <p className="text-xs text-gray-400 mt-1.5">{formatTimePH(notif.timestamp)}</p>
+                                      </div>
+                                      {!notif.isRead && (
+                                        <motion.div 
+                                          className="ml-auto flex-shrink-0 pt-2"
+                                          animate={{ scale: [1, 1.2, 1] }}
+                                          transition={{ repeat: Infinity, duration: 2 }}
+                                        >
+                                          <div className="w-3 h-3 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50" />
+                                        </motion.div>
+                                      )}
+                                    </motion.div>
                                  ))
                               )}
                            </div>
