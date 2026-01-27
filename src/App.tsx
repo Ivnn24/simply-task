@@ -507,7 +507,7 @@ export default function App() {
                               animate={{ opacity: 1, scale: 1, y: 0 }}
                               exit={{ opacity: 0, scale: 0.95, y: -10 }}
                               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                              className={`fixed md:absolute left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-0 top-1/3 md:top-full md:mt-2 w-[85vw] md:w-96 rounded-2xl shadow-2xl border overflow-hidden z-[101] max-h-[50vh] md:max-h-80 ${
+                              className={`fixed md:absolute left-[50%] md:left-auto md:right-0 top-[50%] md:top-full -translate-x-1/2 md:translate-x-0 -translate-y-1/2 md:translate-y-0 md:mt-2 w-[90vw] md:w-96 rounded-2xl shadow-2xl border overflow-hidden z-[101] max-h-[60vh] md:max-h-80 ${
                                  isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'
                               }`}
                            >
