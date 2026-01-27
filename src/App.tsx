@@ -498,50 +498,57 @@ export default function App() {
                               animate={{ opacity: 1 }}
                               exit={{ opacity: 0 }}
                               onClick={() => setShowNotifications(false)}
-                              className="fixed inset-0 md:hidden z-[99] bg-black/30"
+                              className="fixed inset-0 md:hidden z-[98] bg-black/50"
                            />
                            
                            {/* Notification Modal */}
                            <motion.div
-                              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                              initial={{ opacity: 0, scale: 0.8, y: -20 }}
                               animate={{ opacity: 1, scale: 1, y: 0 }}
-                              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                              className={`fixed md:absolute left-1/2 md:left-auto md:right-0 top-1/2 md:top-full -translate-x-1/2 md:translate-x-0 -translate-y-1/2 md:translate-y-0 md:mt-2 w-[95vw] md:w-96 rounded-3xl shadow-2xl border overflow-hidden z-[101] max-h-[70vh] md:max-h-80 ${
-                                 isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'
+                              exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                              className={`fixed md:absolute left-1/2 md:left-auto md:right-0 top-1/2 md:top-full -translate-x-1/2 md:translate-x-0 -translate-y-1/2 md:translate-y-0 md:mt-2 w-[92vw] sm:w-96 md:w-96 rounded-3xl shadow-2xl border overflow-hidden z-[101] max-h-[80vh] md:max-h-96 ${
+                                 isDarkMode ? 'bg-slate-900 border-slate-600' : 'bg-white border-slate-300'
                               }`}
                            >
-                           <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-opacity-100">
-                              <h3 className={`font-bold text-base ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>🔔 Notifications</h3>
+                           <div className={`p-4 border-b flex justify-between items-center sticky top-0 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-blue-50 border-slate-200'}`}>
+                              <h3 className={`font-bold text-lg flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                                🔔 <span>Notifications</span>
+                              </h3>
                               {notifications.length > 0 && (
-                                 <button onClick={clearNotifications} className="text-xs text-blue-500 hover:underline">Clear all</button>
+                                 <button onClick={clearNotifications} className="text-xs font-bold text-red-500 hover:text-red-700 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded">✕ Clear</button>
                               )}
                            </div>
-                           <div className="overflow-y-auto max-h-[calc(65vh-60px)] md:max-h-[calc(80vh-70px)]">
+                           <div className="overflow-y-auto max-h-[calc(75vh-60px)] md:max-h-[calc(90vh-70px)]">
                               {notifications.length === 0 ? (
-                                 <div className="p-8 text-center text-gray-500 text-sm">✨ No new notifications</div>
+                                 <div className="p-12 text-center">
+                                    <div className="text-4xl mb-2">✨</div>
+                                    <p className="text-gray-500 text-sm font-medium">No new notifications</p>
+                                 </div>
                               ) : (
                                  notifications.map(notif => (
                                     <div 
                                        key={notif.id} 
                                        onClick={() => handleNotificationClick(notif.id)}
-                                       className={`p-4 border-b last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer flex gap-3 ${
-                                          !notif.isRead ? (isDarkMode ? 'bg-slate-700/30' : 'bg-blue-50/50') : ''
-                                       } ${isDarkMode ? 'border-slate-700' : 'border-gray-100'}`}
+                                       className={`p-4 border-b last:border-0 hover:bg-gray-100 dark:hover:bg-slate-700/80 cursor-pointer flex gap-3 transition-colors ${
+                                          !notif.isRead ? (isDarkMode ? 'bg-slate-800/80' : 'bg-blue-100/80') : ''
+                                       } ${isDarkMode ? 'border-slate-700' : 'border-slate-200'}`}
                                     >
-                                       <div className={`mt-1 flex-shrink-0 ${
-                                          notif.type === 'alert' ? 'text-red-500' : notif.type === 'warning' ? 'text-orange-500' : 'text-blue-500'
+                                       <div className={`flex-shrink-0 text-2xl pt-1 ${
+                                          notif.type === 'alert' ? '' : notif.type === 'warning' ? '' : ''
                                        }`}>
-                                          {notif.type === 'alert' ? <AlertTriangle className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
+                                          {notif.type === 'alert' ? '🔴' : notif.type === 'warning' ? '🟠' : '🔵'}
                                        </div>
-                                       <div>
-                                          <p className={`text-sm ${isDarkMode ? 'text-slate-200' : 'text-slate-800'} ${!notif.isRead ? 'font-semibold' : ''}`}>
+                                       <div className="flex-1 min-w-0">
+                                          <p className={`text-sm font-semibold leading-tight ${isDarkMode ? 'text-slate-100' : 'text-slate-900'}`}>
                                              {notif.message}
                                           </p>
-                                          <p className="text-xs text-gray-400 mt-1">{formatTimePH(notif.timestamp)}</p>
+                                          <p className="text-xs text-gray-400 mt-1.5">{formatTimePH(notif.timestamp)}</p>
                                        </div>
                                        {!notif.isRead && (
-                                          <div className="ml-auto mt-2 w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                                          <div className="ml-auto flex-shrink-0 pt-2">
+                                             <div className="w-3 h-3 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50 animate-pulse" />
+                                          </div>
                                        )}
                                     </div>
                                  ))
