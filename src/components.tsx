@@ -849,14 +849,14 @@ export const TaskForm = ({ onClose }: { onClose?: () => void }) => {
                  <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Priority</label>
                     <div className="flex gap-1 p-1 bg-slate-100 rounded-xl">
-                       {(['Urgent', 'Medium', 'Low'] as Priority[]).map(p => (
+                       {(['Urgent', 'High', 'Medium', 'Low'] as Priority[]).map(p => (
                           <button
                             key={p}
                             type="button"
                             onClick={() => setPriority(p)}
-                            className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${priority === p ? 'bg-white shadow text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
+                            className={`flex-1 py-1.5 rounded-lg text-[9px] font-bold transition-all whitespace-nowrap ${priority === p ? 'bg-white shadow text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
                           >
-                            {p.charAt(0)}
+                            {p}
                           </button>
                        ))}
                     </div>

@@ -507,19 +507,19 @@ export default function App() {
                               animate={{ opacity: 1, scale: 1, y: 0 }}
                               exit={{ opacity: 0, scale: 0.95, y: -10 }}
                               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                              className={`fixed md:absolute left-[50%] md:left-auto md:right-0 top-[50%] md:top-full -translate-x-1/2 md:translate-x-0 -translate-y-1/2 md:translate-y-0 md:mt-2 w-[90vw] md:w-96 rounded-2xl shadow-2xl border overflow-hidden z-[101] max-h-[60vh] md:max-h-80 ${
+                              className={`fixed md:absolute left-1/2 md:left-auto md:right-0 top-1/2 md:top-full -translate-x-1/2 md:translate-x-0 -translate-y-1/2 md:translate-y-0 md:mt-2 w-[95vw] md:w-96 rounded-3xl shadow-2xl border overflow-hidden z-[101] max-h-[70vh] md:max-h-80 ${
                                  isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'
                               }`}
                            >
-                           <div className="p-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-opacity-100">
-                              <h3 className={`font-bold text-sm ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Notifications</h3>
+                           <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-opacity-100">
+                              <h3 className={`font-bold text-base ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>🔔 Notifications</h3>
                               {notifications.length > 0 && (
                                  <button onClick={clearNotifications} className="text-xs text-blue-500 hover:underline">Clear all</button>
                               )}
                            </div>
-                           <div className="overflow-y-auto max-h-[calc(50vh-50px)] md:max-h-[calc(80vh-60px)]">
+                           <div className="overflow-y-auto max-h-[calc(65vh-60px)] md:max-h-[calc(80vh-70px)]">
                               {notifications.length === 0 ? (
-                                 <div className="p-8 text-center text-gray-500 text-sm">No new notifications</div>
+                                 <div className="p-8 text-center text-gray-500 text-sm">✨ No new notifications</div>
                               ) : (
                                  notifications.map(notif => (
                                     <div 
