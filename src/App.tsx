@@ -5,6 +5,8 @@ import {
   TaskForm, TaskCard, ScoreCard, StreakCard, FocusModeButton, 
   AnalyticsDashboard, SubjectView, WeeklyReport 
 } from './components';
+import { AIInsights } from './AIInsights';
+import { exportTasksToCSV, exportTasksToPDF } from './export-service';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sun, Moon, List, Grid3x3, BookOpen, Sparkles, 
@@ -502,6 +504,32 @@ export default function App() {
                   </AnimatePresence>
                </div>
 
+              {/* Export Buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => exportTasksToCSV(tasks, `tasks-${new Date().toISOString().split('T')[0]}.csv`)}
+                  className={`p-2.5 rounded-xl transition-all border text-xs font-medium ${
+                    isDarkMode 
+                      ? 'bg-slate-800 text-green-400 border-slate-700 hover:bg-slate-700' 
+                      : 'bg-white text-green-600 border-slate-200 hover:bg-slate-50 shadow-sm'
+                  }`}
+                  title="Export to CSV"
+                >
+                  CSV
+                </button>
+                <button
+                  onClick={() => exportTasksToPDF(tasks, `tasks-${new Date().toISOString().split('T')[0]}.html`)}
+                  className={`p-2.5 rounded-xl transition-all border text-xs font-medium ${
+                    isDarkMode 
+                      ? 'bg-slate-800 text-purple-400 border-slate-700 hover:bg-slate-700' 
+                      : 'bg-white text-purple-600 border-slate-200 hover:bg-slate-50 shadow-sm'
+                  }`}
+                  title="Export to PDF/HTML"
+                >
+                  PDF
+                </button>
+              </div>
+
               <button
                 onClick={toggleTheme}
                 className={`p-2.5 rounded-xl transition-all border ${
@@ -544,6 +572,7 @@ export default function App() {
                 </div>
                 <WeeklyReport />
                 <AnalyticsDashboard />
+                <AIInsights isDarkMode={isDarkMode} />
              </div>
           </aside>
 
