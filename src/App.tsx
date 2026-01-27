@@ -440,7 +440,7 @@ export default function App() {
               </div>
               <div>
                 <h1 className={`text-xl font-bold tracking-tight leading-none mb-1 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                  Task Master
+                  SimplyTask
                 </h1>
                 <div className={`flex items-center gap-1.5 text-xs font-medium ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                   <Clock className="w-3 h-3" />
@@ -840,7 +840,7 @@ export default function App() {
                     <HelpCircle className="w-6 h-6 text-blue-500" />
                   </div>
                   <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                    How to Use Task Master
+                    How to Use SimplyTask
                   </h2>
                 </div>
                 <button
